@@ -160,6 +160,82 @@ namespace AirlineApp.Objects
         conn.Close();
     }
 
+    public void AddCity(City newCity)
+    {
+        SqlConnection conn = DB.Connection();
+        conn.Open();
+
+        SqlCommand cmd = new SqlCommand("INSERT INTO flight_cities (city_id, flight_id) VALUES (@CityId, @FlightId);", conn);
+
+        SqlParameter cityParameter = new SqlParameter("@CityId", newCity.GetId());
+        SqlParameter flightParameter = new SqlParameter("@FlightId", this.GetId());
+
+        cmd.Parameters.Add(cityParameter);
+        cmd.Parameters.Add(flightParameter);
+
+        cmd.ExecuteNonQuery();
+
+        if (conn != null)
+        {
+            conn.Close();
+        }
+    }
+
+    public List<City> GetCities()
+    {
+        SqlConnection conn = DB.Connection();
+        conn.Open();
+
+        SqlCommand cmd = new SqlCommand("SELECT city_id FROM flight_cities WHERE flight_id = @FlightId;", conn);
+        SqlParameter flightIdParameter = new SqlParameter("@FlightId", this.GetId());
+
+        cmd.Parameters.Add(flightIdParameter);
+
+        SqlDataReader rdr = cmd.ExecuteReader();
+
+        List<int> cityIds = new List<int>{};
+
+        while(rdr.Read())
+        {
+            int cityId = rdr.GetInt32(0);
+            cityIds.Add(cityId);
+        }
+        if (rdr != null)
+        {
+          rdr.Close();
+        }
+
+        List<City> CityList = new List<City> {};
+
+        foreach (int cityId in cityIds)
+        {
+
+            SqlCommand cityQuery = new SqlCommand("SELECT * FROM cities WHERE id = @CityId;", conn);
+
+            SqlParameter idParam = new SqlParameter("@CityId", cityId);
+
+            cityQuery.Parameters.Add(idParam);
+
+            SqlDataReader queryReader = cityQuery.ExecuteReader();
+            while (queryReader.Read())
+            {
+                int cityIdWhile = queryReader.GetInt32(0);
+                string cityName = queryReader.GetString(1);
+                City foundCity = new City(cityName, cityIdWhile);
+                CityList.Add(foundCity);
+            }
+            if (queryReader != null)
+            {
+                queryReader.Close();
+            }
+        }
+        if (conn != null)
+        {
+            conn.Close();
+        }
+        return CityList;
+    }
+
     public string GetStatus()
     {
         return _status;
