@@ -127,6 +127,27 @@ namespace AirlineApp.Objects
         return foundCity;
     }
 
+    public void AddFlight(Flight newFlight)
+    {
+        SqlConnection conn = DB.Connection();
+        conn.Open();
+
+        SqlCommand cmd = new SqlCommand("INSERT INTO flight_cities (city_id, flight_id) VALUES (@FlightId, @CityId);", conn);
+
+        SqlParameter flightParameter = new SqlParameter("@FlightId", newFlight.GetId());
+        SqlParameter cityParameter = new SqlParameter("@CityId", this.GetId());
+
+        cmd.Parameters.Add(flightParameter);
+        cmd.Parameters.Add(cityParameter);
+
+        cmd.ExecuteNonQuery();
+
+        if (conn != null)
+        {
+            conn.Close();
+        }
+    }
+
 public static void DeleteAll()
 {
     SqlConnection conn = DB.Connection();
