@@ -148,6 +148,39 @@ namespace AirlineApp.Objects
         }
     }
 
+    public List<Flight> GetFlights()
+    {
+        SqlConnection conn = DB.Connection();
+        conn.Open();
+
+        SqlCommand cmd = new SqlCommand("SELECT flight_id FROM flights_cities WHERE city_id = @CityId;", conn);
+        SqlParameter cityIdParam = new SqlParameter("@CityId", this.GetId());
+
+        cmd.Parameters.Add(cityIdParam);
+
+        SqlDataReader rdr = cmd.ExecuteReader();
+
+        List<int> flightIds = new List<int> {};
+        while (rdr.Read())
+        {
+            int flightId = rdr.GetInt32(0)
+            flightIds.Add(flightId);
+        }
+        if (rdr != null)
+        {
+            rdr.Close();
+        }
+
+        List<Flight> FlightList = new List<Flight> {};
+
+        foreach (int flightId in flightIds)
+        {
+            SqlCommand flightQuery = new SqlCommand("SELECT * FROM flights WHERE id = @FlightId;", conn);
+
+            SqlParameter flightIdParam = SqlParameter
+        }
+    }
+
 public static void DeleteAll()
 {
     SqlConnection conn = DB.Connection();
